@@ -1,20 +1,29 @@
 import requests
 import zipfile
 import os
-import time ,threading
-from swinlnk.swinlnk import SWinLnk
-dir_path = os.path.dirname(os.path.realpath(__file__))
-folder_path = (dir_path)
+import time ,threading #requeried run periodic
+from swinlnk.swinlnk import SWinLnk # requeried create startup application
+
+
+#url for check version
 kontrolurl = "https://raw.githubusercontent.com/bymfd/csautoupdate/main/ver"
+#file to download url
 dosyaurl = "https://github.com/bymfd/csautoupdate/blob/main/dosyalar.zip?raw=true"
 
+#working directory
+folder_path = os.path.dirname(os.path.realpath(__file__))
+
+# try to make startup program static.exe file
+#work only with admin right but not controlled
+# first time execute admin rights
 if os.path.exists("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"):
-    print("ass")
     try:
         swl = SWinLnk()
-        swl.create_lnk(dir_path+"\muhal.exe", 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\muhal.lnk')
+        swl.create_lnk(folder_path+"\muhal.exe", 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\muhal.lnk')
     except:
-        print("asss")
+        print("try to run admin")
+
+# delete downloaded zip file
 def temizlik():
     try:
         print("temizlik")
@@ -24,42 +33,39 @@ def temizlik():
         return False
         print("silemedim abi")
 
-
 def indir():
-    # dosyalar.zipi inidr
+
+    # download dosyalar.zip
     try:
         r = requests.get(dosyaurl, allow_redirects=True)
         open('dosyalar.zip', 'wb').write(r.content)
-
-        # dosyaları olduğu klasöre çıkart
+        # extract zip
         with zipfile.ZipFile("dosyalar.zip", "r") as zip_ref:
             zip_ref.extractall()
             return True
     except:
-        print("olmaadı be indiremedim ya da yazamadım ")
+        print("download or write dont work ")
 
 
-
-
+# find net version
 def netversionbul():
-
     try:
         r = requests.get(kontrolurl)
         netversion = r.text.strip()
         return netversion
     except:
-        print("bağlanamadı")
+        print("Connection failed")
 
-
+# find local version number
 def localversionbul():
     try:
         f = open("ver", "r")
         localversion = f.read().strip()
         return localversion
     except:
-        print("okunamadı")
+        print("read version fail")
 
-
+#  change local file version with netversion
 def localversiondegistir():
     temizlik()
     global netverison
@@ -69,22 +75,22 @@ def localversiondegistir():
         f.write(str(netversionbul()))
         f.close()
     except :
-        print("www")
+        print("Write error")
 
-
+# compare local version and net version
 def versionkarsilastir():
     if localversionbul() != netversionbul():
+        #versions not same
         if indir():
+            #downloaded file succesfully
             localversiondegistir()
     else:
-        print("herşey güncel görünüyor")
-
+        print("up to date")
+    # work perioodic
     threading.Timer(10, versionkarsilastir).start()
 
+
+
+
+#start every call
 versionkarsilastir()
-
-
-
-
-
-
