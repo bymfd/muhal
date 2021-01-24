@@ -8,7 +8,6 @@ from swinlnk.swinlnk import SWinLnk  # requeried create startup application
 kontrolurl = "https://raw.githubusercontent.com/bymfd/csautoupdate/main/ver"
 # file to download url
 dosyaurl = "https://github.com/bymfd/csautoupdate/blob/main/dosyalar.zip?raw=true"
-
 # working directory
 folder_path = os.path.dirname(os.path.realpath(__file__))
 
